@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mqd.gxcj.subjectmanager.mapper.UserMapper">
+
+<select id="getUserInfo" resultType="com.mqd.gxcj.subjectmanager.pojo.vo.UserVo">
+    SELECT
+            u.id,
+            u.`name`,
+            sex,
+            avatar,
+            graduate_institution,
+            specialization,
+            graduate_date,
+            birth,
+            country,
+            origo,
+            address,
+            home_telephone,
+            office_telephone,
+            mobile1,
+            mobile2,
+            email,
+            entry_time,
+            u.description,
+            e.`name` education,
+            d.`name` duty,
+            r.`name` rank,
+            sb.`name` `subject`
+    FROM `s_user` u
+                 LEFT JOIN  s_education e ON u.education=e.id
+                 LEFT JOIN s_duty d ON u.duty=d.id
+                 LEFT JOIN s_rank r ON u.rank=r.id
+                 LEFT JOIN s_subject sb ON u.subject_id=sb.id
+
+    WHERE u.id=#{id}
+</select>
+</mapper>
