@@ -1,6 +1,7 @@
 package com.mqd.gxcj.subjectmanager.config;
 
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -13,8 +14,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -34,6 +37,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -109,6 +113,29 @@ public class AppConfig implements WebMvcConfigurer {
         return objectMapper;
     }
 
+    /**
+     * url参数转换LocalDate
+     */
+    @Bean
+    public Converter<String, LocalDate> localDateConverter() {
+        return new Converter<String, LocalDate>() {
+            @Override
+            public LocalDate convert(String source) {
+                return LocalDate.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            }
+        };
+    }
+
+    @Bean
+    public Converter<String, LocalDateTime> localDateTimeConverter() {
+        return new Converter<String, LocalDateTime>() {
+            @Override
+            public LocalDateTime convert(String source) {
+                return LocalDateTime.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            }
+        };
+    }
+
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
         RedisSerializer<String> redisSerializer = new StringRedisSerializer();
@@ -131,6 +158,13 @@ public class AppConfig implements WebMvcConfigurer {
                 .cacheDefaults(config)
                 .build();
         return cacheManager;
+    }
+
+    @Bean("userIdKeyGenerator")
+    public KeyGenerator keyGenerator() {
+        return (Object o, Method method, Object... objects) -> {
+            return StpUtil.getLoginId();
+        };
     }
 
     @Override

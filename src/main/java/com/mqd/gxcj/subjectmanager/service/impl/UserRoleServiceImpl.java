@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.service.impl;
 
+import com.mqd.gxcj.subjectmanager.pojo.Role;
 import com.mqd.gxcj.subjectmanager.pojo.UserRole;
 import com.mqd.gxcj.subjectmanager.mapper.UserRoleMapper;
 import com.mqd.gxcj.subjectmanager.service.UserRoleService;
@@ -22,9 +23,4 @@ import java.util.List;
 @Service
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements UserRoleService {
 
-    @Cacheable(key = "#id")
-    @Override
-    public List<String> getRoleList(String id) {
-        return baseMapper.getRoleList(id);
-    }
 }

@@ -34,4 +34,10 @@
 
     WHERE u.id=#{id}
 </select>
+
+<select id="listOnProjectMember" resultType="com.mqd.gxcj.subjectmanager.pojo.User">
+    SELECT su.*,pus.role_id FROM `s_user` su
+    LEFT JOIN `p_user_role` pus on su.id=pus.user_id
+    ${ew.customSqlSegment}
+</select>
 </mapper>

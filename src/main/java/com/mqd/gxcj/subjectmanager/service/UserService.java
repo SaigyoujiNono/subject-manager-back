@@ -1,11 +1,11 @@
 package com.mqd.gxcj.subjectmanager.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserForm;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserModifyForm;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserVo;
+import com.mqd.gxcj.subjectmanager.pojo.vo.*;
 
 /**
  * <p>
@@ -33,4 +33,22 @@ public interface UserService extends IService<User> {
      * 用户自己修改个人信息，需要审核
      */
     boolean modifyUserSelf(UserModifyForm userModify) throws AppException;
+
+    /**
+     * 获取待项目选择的成员列表
+     */
+    IPage<User> listOnProjectMember(IPage<User> page, QueryWrapper<User> queryWrapper);
+
+    /**
+     * 可供选择的专家列表
+     */
+    IPage<User> listOnProjectExpert(IPage<User> page, QueryWrapper<User> queryWrapper);
+
+    /**
+     * 根据条件获取用户列表
+     * @param userQuery 查询条件
+     * @param appPage   页面信息
+     * @return  page
+     */
+    IPage<User> getUserListByQuery(UserQuery userQuery, AppPage appPage);
 }

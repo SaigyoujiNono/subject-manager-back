@@ -13,11 +13,11 @@ public class MybatisPlusFillHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         this.strictInsertFill(metaObject, "createTime", LocalDateTime.class,LocalDateTime.now()); // 起始版本 3.3.3(推荐)
-//        this.strictInsertFill(metaObject, "gmtModified", LocalDateTime.class,LocalDateTime.now());
+        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class,LocalDateTime.now());
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-//        this.strictInsertFill(metaObject, "gmtModified", LocalDateTime.class,LocalDateTime.now());
+        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class,LocalDateTime.now());
     }
 }

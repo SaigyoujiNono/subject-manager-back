@@ -1,8 +1,9 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.dev33.satoken.annotation.SaMode;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.User;
 import com.mqd.gxcj.subjectmanager.pojo.vo.AppPage;
@@ -14,6 +15,8 @@ import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +40,7 @@ public class UserController {
     @ApiOperation(value = "添加一个新用户")
     @PostMapping("/user")
     public R addUser(@RequestBody @Validated UserForm userForm) throws AppException {
-        boolean save = userService.saveUser(userForm);
-        if (save){
+        if (userService.saveUser(userForm)){
             return R.ok();
         }
         throw new AppException(RStatus.ERROR);
@@ -46,14 +48,15 @@ public class UserController {
 
     @ApiOperation(value = "获取用户列表")
     @GetMapping("/user")
-    public R getUserList(UserQuery userQuery, AppPage appPage){
-
-        return R.ok();
+    public R getUserList(UserQuery userQuery,@Validated AppPage appPage){
+        IPage<User> userPage = userService.getUserListByQuery(userQuery, appPage);
+        BeanUtils.copyProperties(userPage, appPage);
+        return R.ok().put("users", userPage.getRecords()).put("pageInfo", appPage);
     }
 
     @ApiOperation(value = "用户自己修改信息")
     @PostMapping("/modifySelf")
-    public R modifyUserSelf(UserModifyForm modifyForm) throws AppException {
+    public R modifyUserSelf(@Validated UserModifyForm modifyForm) throws AppException {
         if (userService.modifyUserSelf(modifyForm)){
             return R.ok();
         }
@@ -70,6 +73,32 @@ public class UserController {
     @PutMapping("/modifySelf")
     public R checkUserSelf(){
         return R.ok();
+    }
+
+    @ApiOperation(value = "项目申报时提供可选择的列表")
+    @GetMapping("/listOnMember")
+    public R listOnProjectMember(Integer subjectId,@Validated AppPage appPage){
+        QueryWrapper<User> userQuery = new QueryWrapper<>();
+        userQuery.eq("subject_id", subjectId);
+        userQuery.eq("role_id",2);
+        IPage<User> page = new Page<>(appPage.getCurrent(), appPage.getSize());
+        userService.listOnProjectMember(page,userQuery);
+        BeanUtils.copyProperties(page, appPage);
+        return R.ok().put("listMember",page.getRecords()).put("pageInfo",appPage);
+    }
+
+    @ApiOperation(value = "可供选择的专家列表")
+    @GetMapping("/listOnExpert")
+    public R listOnExpertList(String name, @Validated AppPage appPage) {
+        QueryWrapper<User> userQuery = new QueryWrapper<>();
+        userQuery.eq("role_id",3);
+        if (StringUtils.hasText(name)) {
+            userQuery.likeRight("name",name);
+        }
+        IPage<User> page = new Page<>(appPage.getCurrent(), appPage.getSize());
+        userService.listOnProjectMember(page,userQuery);
+        BeanUtils.copyProperties(page, appPage);
+        return R.ok().put("listExpert",page.getRecords()).put("pageInfo",appPage);
     }
 
 }

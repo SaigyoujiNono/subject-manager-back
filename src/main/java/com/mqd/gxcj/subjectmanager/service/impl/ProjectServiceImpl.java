@@ -2,28 +2,34 @@ package com.mqd.gxcj.subjectmanager.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
-import com.mqd.gxcj.subjectmanager.pojo.Account;
-import com.mqd.gxcj.subjectmanager.pojo.Project;
+import com.mqd.gxcj.subjectmanager.pojo.*;
 import com.mqd.gxcj.subjectmanager.mapper.ProjectMapper;
-import com.mqd.gxcj.subjectmanager.pojo.ProjectUser;
+import com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion;
 import com.mqd.gxcj.subjectmanager.pojo.dto.RelevanceInfo;
 import com.mqd.gxcj.subjectmanager.pojo.vo.AppProjectForm;
-import com.mqd.gxcj.subjectmanager.service.AccountService;
-import com.mqd.gxcj.subjectmanager.service.ProjectService;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ApprovalProjectForm;
+import com.mqd.gxcj.subjectmanager.pojo.vo.CheckProjectForm;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ProjectDetail;
+import com.mqd.gxcj.subjectmanager.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mqd.gxcj.subjectmanager.service.ProjectUserService;
-import com.mqd.gxcj.subjectmanager.service.UtilsService;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -33,6 +39,7 @@ import java.util.List;
  * @author 莫桥德
  * @since 2022-03-18
  */
+@CacheConfig(cacheNames = "project")
 @Service
 public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> implements ProjectService {
 
@@ -44,6 +51,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Resource
     private ProjectUserService projectUserService;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private ProjectExpertizeService projectExpertizeService;
 
     @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     @Override
@@ -103,5 +116,142 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             projectUserService.saveBatch(projectUsers);
         }
         return true;
+    }
+
+    @Cacheable(key = "#id")
+    @Override
+    public ProjectDetail getProjectDetailById(String id) throws AppException {
+        ProjectDetail projectDetail = new ProjectDetail();
+        //查询项目id是否存在
+        Project project = baseMapper.selectById(id);
+        if (project == null) {
+            throw new AppException(RStatus.PROJECT_NOT_EXIST);
+        }
+        //根据项目id查询项目参与用户
+        QueryWrapper<ProjectUser> puQuery = new QueryWrapper<>();
+        puQuery.eq("project_id",id);
+        List<ProjectUser> list = projectUserService.list(puQuery);
+        //将拿到的参与成员id组成列表
+        List<String> userIds = list.stream().map(ProjectUser::getUserId).collect(Collectors.toList());
+        QueryWrapper<User> userQuery = new QueryWrapper<>();
+        userQuery.in("id",userIds);
+        //获取项目参与人员的详细信息
+        List<User> userList = userService.list(userQuery);
+        //获取项目负责人的详细信息
+        User principal = userService.getById(project.getPrincipal());
+        //获取审核人信息，如果存在的话
+        if (StringUtils.hasText(project.getReviewUId())){
+            User reviewer = userService.getById(project.getReviewUId());
+            projectDetail.setReviewUser(reviewer);
+        }
+        QueryWrapper<ProjectExpertize> peQuery = new QueryWrapper<>();
+        peQuery.eq("pe.project_id", id);
+        List<ExpertOpinion> expertOpinion = projectExpertizeService.getExpertOpinion(peQuery);
+        BeanUtils.copyProperties(project,projectDetail);
+        return projectDetail.setUserDetail(principal).setMemberList(userList).setExpertizeList(expertOpinion);
+    }
+
+    @CacheEvict(key = "#form.id")
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    @Override
+    public boolean checkProjectByMaterial(CheckProjectForm form) throws AppException {
+        //判断项目是否存在
+        Project project = baseMapper.selectById(form.getId());
+        if (project == null) {
+            throw new AppException(RStatus.PROJECT_NOT_EXIST);
+        }
+        //获取传入的专家列表
+        List<String> expertList = form.getExpertList();
+        //如果专家列表不为空则代表通过审核
+        if (expertList != null){
+            //判断传入的专家id是否存在
+            QueryWrapper<User> userQuery = new QueryWrapper<>();
+            userQuery.in("id", expertList);
+            long count = userService.count(userQuery);
+            if (expertList.size() != count){
+                throw new AppException(RStatus.ACCOUNT_NOT_EXIST);
+            }
+            // 存入专家表
+            List<ProjectExpertize> collect = expertList.stream().map(el -> new ProjectExpertize()
+                    .setProjectId(form.getId())
+                    .setUserId(el)
+                    .setExpertOpinion("")
+                    .setStage(Project.EXPERT)).collect(Collectors.toList());
+            //设为专家评审阶段
+            project.setStatus(Project.EXPERT)
+                    .setReviewTime(LocalDateTime.now())
+                    .setReviewUId((String) StpUtil.getLoginId());
+            baseMapper.updateById(project);
+            projectExpertizeService.saveBatch(collect);
+            return true;
+        }
+        // 如果专家列表为空则代表不通过材料审核，需要填写不通过意见
+        String opinion = form.getOpinion();
+        if (!StringUtils.hasText(opinion)){
+            throw new AppException(RStatus.VERIFY_ERROR);
+        }
+        project.setStatus(Project.NO_CHECKED)
+                .setNoPassOpinion(opinion)
+                .setReviewTime(LocalDateTime.now())
+                .setReviewUId((String) StpUtil.getLoginId());
+        baseMapper.updateById(project);
+        return true;
+    }
+
+    @CacheEvict(key = "#projectExpertize.projectId")
+    @Override
+    public boolean expertCheckProject(ProjectExpertize projectExpertize) {
+        projectExpertize.setId(null);
+        return projectExpertizeService.update(projectExpertize,
+                new QueryWrapper<ProjectExpertize>()
+                .eq("user_id", projectExpertize.getUserId())
+                .eq("project_id", projectExpertize.getProjectId())
+        );
+    }
+
+    @CacheEvict(key = "#approvalProject.id")
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    @Override
+    public boolean approvalProject(ApprovalProjectForm approvalProject) throws AppException {
+        // 判断项目id是否存在
+        String id = approvalProject.getId();
+        Project project = baseMapper.selectById(id);
+        if (project == null) {
+            throw new AppException(RStatus.PROJECT_NOT_EXIST);
+        }
+        // 判断项目状态是否在专家评审状态 只有在专家评审状态才可以继续
+        if (!project.getStatus().equals(Project.EXPERT)) {
+            throw new AppException(RStatus.PROJECT_STATUS_ERROR);
+        }
+        // 获取当前用户
+        String loginId = (String)StpUtil.getLoginId();
+        User user = userService.getById(loginId);
+        if (user == null) {
+            throw new AppException(RStatus.ACCOUNT_NOT_EXIST);
+        }
+        // 获取项目意见
+        String opinion = approvalProject.getOpinion();
+        // 拒绝立项
+        if (StringUtils.hasText(opinion)) {
+            // 将项目重新设置为不通过审核状态
+            project.setStatus(Project.NO_CHECKED)
+                    .setReviewUId(user.getId())
+                    .setNoPassOpinion(opinion)
+                    .setReviewTime(LocalDateTime.now());
+            baseMapper.updateById(project);
+            return true;
+        }
+        // 同意立项
+        project.setStatus(Project.COMMITTED)
+                .setReviewUId(user.getId())
+                .setNoPassOpinion("")
+                .setReviewTime(LocalDateTime.now());
+        baseMapper.updateById(project);
+        return true;
+    }
+
+    @Override
+    public IPage<Project> pageMyProjectList(IPage<Project> page, QueryWrapper<Project> projectQuery) {
+        return baseMapper.pageMyProjectList(page, projectQuery);
     }
 }

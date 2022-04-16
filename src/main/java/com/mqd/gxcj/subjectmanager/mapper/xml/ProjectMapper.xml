@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mqd.gxcj.subjectmanager.mapper.ProjectMapper">
 
+    <select id="pageMyProjectList" resultType="com.mqd.gxcj.subjectmanager.pojo.Project">
+        SELECT DISTINCT p.*
+        FROM `s_project` p
+        LEFT JOIN s_project_user pu on p.id = pu.project_id
+        ${ew.customSqlSegment}
+    </select>
 </mapper>

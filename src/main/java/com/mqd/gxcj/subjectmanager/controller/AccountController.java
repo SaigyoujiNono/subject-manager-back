@@ -1,6 +1,8 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaMode;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Account;
@@ -68,7 +70,8 @@ public class AccountController {
         RelevanceInfo relevanceInfo = utilsService.getRelevanceInfo();
         return R.ok().put("userInfo",userInfo)
                 .put("roleList",roleList)
-                .put("baseInfo",relevanceInfo);
+                .put("baseInfo",relevanceInfo)
+                .put("permission", StpUtil.getPermissionList());
     }
 
     @ApiOperation(value = "注销账户")

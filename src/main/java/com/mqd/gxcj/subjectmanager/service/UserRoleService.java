@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.service;
 
+import com.mqd.gxcj.subjectmanager.pojo.Role;
 import com.mqd.gxcj.subjectmanager.pojo.UserRole;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -14,5 +15,4 @@ import java.util.List;
  * @since 2022-03-18
  */
 public interface UserRoleService extends IService<UserRole> {
-    List<String> getRoleList(String id);
 }

@@ -1,6 +1,7 @@
 package com.mqd.gxcj.subjectmanager.pojo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
@@ -8,6 +9,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -27,22 +31,30 @@ public class ProjectExpertize implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     @ApiModelProperty("专家id")
     private String userId;
 
     @ApiModelProperty("项目id")
+    @NotBlank
     private String projectId;
 
     @ApiModelProperty("项目阶段，commited为初审阶段，finish为项目验收阶段")
     private String stage;
 
     @ApiModelProperty("专家意见")
+    @NotBlank
     private String expertOpinion;
 
     @ApiModelProperty("创建时间")
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
 
 
 }

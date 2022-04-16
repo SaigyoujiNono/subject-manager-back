@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
@@ -17,10 +18,11 @@ import java.net.URLEncoder;
 import java.util.UUID;
 
 
-@Api(tags = "文件上传与管理")
+@Api(tags = "文件管理")
 @RestController
 @RequestMapping("/file")
 @Slf4j
+@SaCheckLogin
 public class FileController {
 
     @Value("${file.file-location}")
@@ -42,8 +44,8 @@ public class FileController {
                 boolean mkdirs = parent.mkdirs();
             }
             //创建文件夹
-            String uuid = null;
-            File dest = null;
+            String uuid;
+            File dest;
             do {
                 uuid = UUID.randomUUID().toString();
                 dest = new File(fileLocation + "/" + uuid);
@@ -67,9 +69,9 @@ public class FileController {
             if (!imgPath.exists()){
                 boolean mkdirs = imgPath.mkdirs();
             }
-            String uuid = null;
-            File dest = null;
-            String filename = null;
+            String uuid;
+            File dest ;
+            String filename;
             do {
                 uuid = UUID.randomUUID().toString();
                 filename = uuid +
@@ -84,7 +86,7 @@ public class FileController {
 
     @ApiOperation(value = "下载文件的接口")
     @GetMapping("/download/file/{filename}")
-    public String downloadFile(HttpServletResponse response, @PathVariable String filename) throws AppException, FileNotFoundException, UnsupportedEncodingException {
+    public String downloadFile(HttpServletResponse response, @PathVariable String filename) throws AppException, UnsupportedEncodingException {
         File file = new File(fileLocation + "/" + filename);
         if (!file.exists()){
             throw new AppException(RStatus.FILE_NOT_EXIST);
@@ -98,14 +100,8 @@ public class FileController {
         response.setHeader("Content-Disposition", "attachment; fileName="+  files[0].getName() +";filename*=utf-8''"+ URLEncoder.encode(files[0].getName(),"UTF-8"));
         response.setContentLength((int) files[0].length());
         System.out.println(files[0].getName());
-        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(files[0]));){
-            byte[] buff = new byte[4096];
-            ServletOutputStream os = response.getOutputStream();
-            int index = 0;
-            while ((index = bis.read(buff)) != -1){
-                os.write(buff,0,index);
-                os.flush();
-            }
+        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(files[0]))){
+            extracted(response, bis);
         } catch (IOException e) {
             log.error("下载文件出错");
             e.printStackTrace();
@@ -114,9 +110,19 @@ public class FileController {
         return "ok";
     }
 
+    private void extracted(HttpServletResponse response, BufferedInputStream bis) throws IOException {
+        byte[] buff = new byte[4096];
+        ServletOutputStream os = response.getOutputStream();
+        int index;
+        while ((index = bis.read(buff)) != -1){
+            os.write(buff,0,index);
+            os.flush();
+        }
+    }
+
     @ApiOperation(value = "获取图片的接口")
     @GetMapping("/download/img/{filename}")
-    public String downloadImg(HttpServletResponse response, @PathVariable String filename) throws AppException, IOException {
+    public String downloadImg(HttpServletResponse response, @PathVariable String filename) throws AppException {
         File file = new File(imgLocation + "/" + filename);
         if (!file.exists()){
             throw new AppException(RStatus.FILE_NOT_EXIST);
@@ -124,14 +130,8 @@ public class FileController {
         response.reset();
         response.setCharacterEncoding("utf-8");
         response.setContentType("image/png");
-        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));){
-            byte[] buff = new byte[4096];
-            ServletOutputStream os = response.getOutputStream();
-            int index = 0;
-            while ((index = bis.read(buff)) != -1){
-                os.write(buff,0,index);
-                os.flush();
-            }
+        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))){
+            extracted(response, bis);
         } catch (IOException e) {
             log.error("下载图片出错");
             e.printStackTrace();

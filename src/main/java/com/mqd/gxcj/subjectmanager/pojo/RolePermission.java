@@ -29,7 +29,7 @@ public class RolePermission implements Serializable {
     private Integer roleId;
 
     @ApiModelProperty("权限id")
-    private Integer permission;
+    private Integer permissionId;
 
 
 }

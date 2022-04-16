@@ -1,8 +1,7 @@
 package com.mqd.gxcj.subjectmanager.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +26,15 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "ProjectExpenditure对象", description = "经费申请表")
 public class ProjectExpenditure implements Serializable {
 
+    // 第一次提交的状态
+    public static final String COMMITTED = "committed";
+
+    // 审核通过的状态
+    public static final String CHECKED = "checked";
+
+    // 审核不通过的状态
+    public static final String NO_CHECKED = "no-checked";
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
@@ -48,7 +56,7 @@ public class ProjectExpenditure implements Serializable {
     @ApiModelProperty("申请经费")
     private BigDecimal expenditure;
 
-    @ApiModelProperty("审核状态，commited已提交，checked审核通过，no-checked审核为通过")
+    @ApiModelProperty("审核状态，committed已提交，checked审核通过，no-checked审核为通过")
     private String checkStatus;
 
     @ApiModelProperty("审核人id")
@@ -58,7 +66,9 @@ public class ProjectExpenditure implements Serializable {
     private LocalDateTime checkTime;
 
     @ApiModelProperty("提交时间")
-    private LocalDateTime commitedTime;
+    private LocalDateTime committedTime;
 
+    @ApiModelProperty("未通过审核的意见")
+    private String noCheckedOpinion;
 
 }

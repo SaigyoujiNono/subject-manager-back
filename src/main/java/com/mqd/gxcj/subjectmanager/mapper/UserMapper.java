@@ -1,8 +1,11 @@
 package com.mqd.gxcj.subjectmanager.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mqd.gxcj.subjectmanager.pojo.vo.UserVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -14,5 +17,13 @@ import com.mqd.gxcj.subjectmanager.pojo.vo.UserVo;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+    /**
+     * 获取用户信息
+     */
     UserVo getUserInfo(String id);
+
+    /**
+     * 获取待项目选择的成员列表
+     */
+    IPage<User> listOnProjectMember(IPage<User> page, @Param("ew") QueryWrapper<User> queryWrapper);
 }

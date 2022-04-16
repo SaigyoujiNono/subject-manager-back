@@ -1,8 +1,7 @@
 package com.mqd.gxcj.subjectmanager.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +27,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "Project对象", description = "项目申报表，专家id会有1个以上，单独存储在project_expert表")
 public class Project implements Serializable {
     //用户提交项目申请之后的状态
-    public static final String UNCHECKED = "uncheck";
+    public static final String UNCHECKED = "unchecked";
     //用户未通过材料审核的状态
     public static final String NO_CHECKED = "no-checked";
     //通过材料审核之后进入专家评审
@@ -68,6 +67,7 @@ public class Project implements Serializable {
     private String material;
 
     @ApiModelProperty("项目申报创建日期")
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     @ApiModelProperty("项目提交材料审核阶段，committed等待审核，checked审核通过，no-checked审核为通过")
