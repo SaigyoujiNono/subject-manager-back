@@ -6,6 +6,7 @@ public enum RStatus {
     ACCOUNT_NOT_EXIST(40005,"用户不存在"),
     ACCOUNT_EXIST(40006, "账号已存在"),
     PROJECT_EXIST(40007, "项目已存在"),
+    PROJECT_NOT_EXIST(40024, "项目不存在"),
     VERIFY_ERROR(40013,"参数校验失败"),
     FILE_NOT_EXIST(40014,"文件不存在"),
     NOT_LOGIN(40002,"未登录"),

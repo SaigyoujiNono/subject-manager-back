@@ -2,25 +2,25 @@ package com.mqd.gxcj.subjectmanager.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Project;
-import com.mqd.gxcj.subjectmanager.pojo.vo.AppPage;
-import com.mqd.gxcj.subjectmanager.pojo.vo.AppProjectForm;
-import com.mqd.gxcj.subjectmanager.pojo.vo.CheckProjectQuery;
+import com.mqd.gxcj.subjectmanager.pojo.vo.*;
 import com.mqd.gxcj.subjectmanager.service.ProjectService;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -50,23 +50,60 @@ public class ProjectController {
         throw new AppException(RStatus.ERROR);
     }
 
-    @ApiModelProperty(value = "等待材料审核的项目列表")
+    @ApiOperation(value = "等待材料审核的项目列表")
     @GetMapping("/uncheckProject")
-    public R uncheckProjectList(@Validated CheckProjectQuery queryForm,
+    public R uncheckProjectList(@Validated ProjectQuery queryForm,
                                 @Validated AppPage appPage){
         QueryWrapper<Project> projectQuery = new QueryWrapper<>();
-        Integer subjectId = queryForm.getSubjectId();
+        List<Integer> subjectIds = queryForm.getSubjectIds();
         String name = queryForm.getName();
         if (StringUtils.hasText(name)){
             projectQuery.like("name", queryForm.getName());
         }
-        if (subjectId != null){
-            projectQuery.eq("subjectId", subjectId);
+        if (subjectIds != null){
+            projectQuery.in("subjectId", subjectIds);
         }
+        if (queryForm.getStartTime() != null){
+            projectQuery.ge("create_time",queryForm.getStartTime());
+        }
+        if (queryForm.getEndTime() != null) {
+            projectQuery.le("create_time",queryForm.getEndTime());
+        }
+
         projectQuery.eq("status", Project.UNCHECKED);
 
         IPage<Project> page = new Page<>(appPage.getCurrent(),appPage.getSize());
         projectService.page(page,projectQuery);
-        return R.ok();
+        BeanUtils.copyProperties(page,appPage);
+        return R.ok().put("projectList",page.getRecords()).put("pageInfo",appPage);
+    }
+    
+    @ApiOperation(value = "获取用户自己申请的项目")
+    @GetMapping("/myProject")
+    public R getMyProject(@Validated AppPage appPage) {
+        Object userId = StpUtil.getLoginId();
+        IPage<Project> page = new Page<>(appPage.getCurrent(),appPage.getSize());
+        QueryWrapper<Project> projectQuery = new QueryWrapper<>();
+        projectQuery.eq("principal",userId);
+        projectService.page(page, projectQuery);
+        BeanUtils.copyProperties(page,appPage);
+        return R.ok().put("myProjectList", page.getRecords()).put("pageInfo",appPage);
+    }
+
+    @ApiOperation(value = "根据id获取项目的详细信息")
+    @GetMapping("/project/{id}")
+    public R getProjectDetail(@PathVariable String id) throws AppException {
+        ProjectDetail projectDetailById = projectService.getProjectDetailById(id);
+        return R.ok().put("projectDetail", projectDetailById);
+    }
+
+    @ApiOperation(value = "材料审核的接口")
+    @PostMapping("/checkProject")
+    public R checkProject(@RequestBody CheckProjectForm form) throws AppException {
+        boolean b = projectService.checkProjectByMaterial(form);
+        if (b) {
+            return R.ok();
+        }
+        throw new AppException(RStatus.ERROR);
     }
 }

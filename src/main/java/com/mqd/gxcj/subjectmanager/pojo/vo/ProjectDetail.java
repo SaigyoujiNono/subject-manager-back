@@ -1,48 +1,23 @@
-package com.mqd.gxcj.subjectmanager.pojo;
+package com.mqd.gxcj.subjectmanager.pojo.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.mqd.gxcj.subjectmanager.pojo.User;
+import com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import java.util.List;
 
-/**
- * <p>
- * 项目申报表，专家id会有1个以上，单独存储在project_expert表
- * </p>
- *
- * @author 莫桥德
- * @since 2022-03-22
- */
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
-@TableName("s_project")
-@ApiModel(value = "Project对象", description = "项目申报表，专家id会有1个以上，单独存储在project_expert表")
-public class Project implements Serializable {
-    //用户提交项目申请之后的状态
-    public static final String UNCHECKED = "unchecked";
-    //用户未通过材料审核的状态
-    public static final String NO_CHECKED = "no-checked";
-    //通过材料审核之后进入专家评审
-    public static final String EXPERT = "expert";
-    //项目立项阶段
-    public static final String COMMITTED = "committed";
-    //验收阶段
-    public static final String COMPLETING = "completing";
-
-
-
-    private static final long serialVersionUID = 1L;
+@ApiModel(value = "项目的详细信息", description = "")
+public class ProjectDetail {
 
     @ApiModelProperty("主键id")
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private String id;
 
     @ApiModelProperty("负责人id，外键到用户表")
@@ -67,7 +42,6 @@ public class Project implements Serializable {
     private String material;
 
     @ApiModelProperty("项目申报创建日期")
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     @ApiModelProperty("项目提交材料审核阶段，committed等待审核，checked审核通过，no-checked审核为通过")
@@ -82,6 +56,9 @@ public class Project implements Serializable {
     @ApiModelProperty("审核人id")
     private String reviewUId;
 
+    @ApiModelProperty("审核人信息")
+    private User reviewUser;
+
     @ApiModelProperty("最终验收日期")
     private LocalDate finalReviewTime;
 
@@ -91,5 +68,12 @@ public class Project implements Serializable {
     @ApiModelProperty("最终验收结果，uncheck尚未审核，committed申报阶段，expert专家评审阶段，checked项目立项，completed验收完成")
     private String status;
 
+    @ApiModelProperty("项目负责人信息")
+    private User userDetail;
 
+    @ApiModelProperty("项目负责人信息")
+    private List<User> memberList;
+
+    @ApiModelProperty("专家意见列表")
+    private List<ExpertOpinion> expertizeList;
 }

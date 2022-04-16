@@ -1,6 +1,8 @@
 package com.mqd.gxcj.subjectmanager.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.mapper.*;
 import com.mqd.gxcj.subjectmanager.pojo.*;
@@ -110,6 +112,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userModify.setStatus(UserModify.COMMITTED);
         userModifyService.save(userModify);
         return true;
+    }
+
+    @Override
+    public IPage<User> listOnProjectMember(IPage<User> page, QueryWrapper<User> queryWrapper) {
+        return baseMapper.listOnProjectMember(page, queryWrapper);
+    }
+
+    @Override
+    public IPage<User> listOnProjectExpert(IPage<User> page, QueryWrapper<User> queryWrapper) {
+        return baseMapper.listOnProjectMember(page, queryWrapper);
     }
 
     @Cacheable(key = "#id")

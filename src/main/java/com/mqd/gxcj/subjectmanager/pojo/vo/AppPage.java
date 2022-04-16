@@ -14,4 +14,14 @@ public class AppPage {
     private Long size;
 
     private Long total;
+
+    public Long getCurrent() {
+        if (this.current == null) return 1L;
+        return this.current;
+    }
+
+    public Long getSize() {
+        if (this.size == null) return 10L;
+        return this.size;
+    }
 }

@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mqd.gxcj.subjectmanager.mapper.ProjectExpertizeMapper">
+<resultMap id="expertOpinion" type="com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion">
+    <id column="eo_id" property="id" />
+    <result column="project_id" property="projectId" />
+    <result column="user_id" property="userId" />
+    <result column="stage" property="stage" />
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+    <association property="detail" javaType="com.mqd.gxcj.subjectmanager.pojo.User">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="avatar" property="avatar" />
+        <result column="education" property="education" />
+        <result column="graduate_institution" property="graduateInstitution" />
+        <result column="specialization" property="specialization" />
+        <result column="graduate_date" property="graduateDate" />
+        <result column="duty" property="duty" />
+        <result column="rank" property="rank" />
+        <result column="birth" property="birth" />
+        <result column="country" property="country" />
+        <result column="origo" property="origo" />
+        <result column="address" property="address" />
+        <result column="home_telephone" property="homeTelephone" />
+        <result column="office_telephone" property="officeTelephone" />
+        <result column="mobile1" property="mobile1" />
+        <result column="mobile2" property="mobile2" />
+        <result column="email" property="email" />
+    </association>
+</resultMap>
 
+<select id="getExpertOpinionAndUserInfo" resultMap="expertOpinion">
+    SELECT pe.project_id,
+           pe.id eo_id
+           pe.user_id,
+           pe.stage,
+           pe.expert_opinion,
+           pe.create_time,
+           pe.update_time,
+           u.*
+    FROM `s_project_expertize` pe
+    LEFT JOIN `s_user` u ON pe.user_id=u.id
+    ${ew.customSqlSegment}
+</select>
 </mapper>

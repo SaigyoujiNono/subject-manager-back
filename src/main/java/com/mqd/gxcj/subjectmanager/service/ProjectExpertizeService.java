@@ -1,7 +1,11 @@
 package com.mqd.gxcj.subjectmanager.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpertize;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ProjectExpertizeService extends IService<ProjectExpertize> {
 
+    /**
+     * 获取专家意见以及专家的信息
+     */
+    List<ExpertOpinion> getExpertOpinion(QueryWrapper<ProjectExpertize> queryWrapper);
 }

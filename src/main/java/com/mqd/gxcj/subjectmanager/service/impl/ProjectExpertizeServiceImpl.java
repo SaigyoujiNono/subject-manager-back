@@ -1,10 +1,14 @@
 package com.mqd.gxcj.subjectmanager.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpertize;
 import com.mqd.gxcj.subjectmanager.mapper.ProjectExpertizeMapper;
+import com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion;
 import com.mqd.gxcj.subjectmanager.service.ProjectExpertizeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectExpertizeServiceImpl extends ServiceImpl<ProjectExpertizeMapper, ProjectExpertize> implements ProjectExpertizeService {
 
+    @Override
+    public List<ExpertOpinion> getExpertOpinion(QueryWrapper<ProjectExpertize> queryWrapper) {
+        return baseMapper.getExpertOpinionAndUserInfo(queryWrapper);
+    }
 }
