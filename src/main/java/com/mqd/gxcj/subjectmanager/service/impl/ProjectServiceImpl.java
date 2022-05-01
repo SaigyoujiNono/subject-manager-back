@@ -143,7 +143,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             projectDetail.setReviewUser(reviewer);
         }
         QueryWrapper<ProjectExpertize> peQuery = new QueryWrapper<>();
-        peQuery.eq("project_id", id);
+        peQuery.eq("pe.project_id", id);
         List<ExpertOpinion> expertOpinion = projectExpertizeService.getExpertOpinion(peQuery);
         BeanUtils.copyProperties(project,projectDetail);
         return projectDetail.setUserDetail(principal).setMemberList(userList).setExpertizeList(expertOpinion);
@@ -183,7 +183,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             projectExpertizeService.saveBatch(collect);
             return true;
         }
-        // 如果专家列表为空则代表不同过材料审核，需要填写不通过意见
+        // 如果专家列表为空则代表不通过材料审核，需要填写不通过意见
         String opinion = form.getOpinion();
         if (!StringUtils.hasText(opinion)){
             throw new AppException(RStatus.VERIFY_ERROR);

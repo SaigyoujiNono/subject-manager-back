@@ -14,22 +14,22 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author 莫桥德
- * @since 2022-03-22
+ * @since 2022-05-01
  */
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("p_role_permission")
-@ApiModel(value = "RolePermission对象", description = "")
-public class RolePermission implements Serializable {
+@TableName("p_role_menu")
+@ApiModel(value = "RoleMenu对象", description = "")
+public class RoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("角色id")
     private Integer roleId;
 
-    @ApiModelProperty("权限id")
-    private Integer permissionId;
+    @ApiModelProperty("菜单id")
+    private Integer menuId;
 
 
 }

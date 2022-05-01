@@ -33,7 +33,7 @@
 
 <select id="getExpertOpinionAndUserInfo" resultMap="expertOpinion">
     SELECT pe.project_id,
-           pe.id eo_id
+           pe.id eo_id,
            pe.user_id,
            pe.stage,
            pe.expert_opinion,

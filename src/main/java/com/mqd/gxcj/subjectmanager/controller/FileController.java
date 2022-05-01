@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file")
 @Slf4j
+@SaCheckLogin
 public class FileController {
 
     @Value("${file.file-location}")

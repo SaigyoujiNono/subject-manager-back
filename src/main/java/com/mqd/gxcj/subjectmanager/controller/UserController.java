@@ -49,9 +49,10 @@ public class UserController {
 
     @ApiOperation(value = "获取用户列表")
     @GetMapping("/user")
-    public R getUserList(UserQuery userQuery, AppPage appPage){
-
-        return R.ok();
+    public R getUserList(UserQuery userQuery,@Validated AppPage appPage){
+        IPage<User> userPage = userService.getUserListByQuery(userQuery, appPage);
+        BeanUtils.copyProperties(userPage, appPage);
+        return R.ok().put("users", userPage.getRecords()).put("pageInfo", appPage);
     }
 
     @ApiOperation(value = "用户自己修改信息")

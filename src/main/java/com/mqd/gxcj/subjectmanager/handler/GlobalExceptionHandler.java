@@ -1,6 +1,7 @@
 package com.mqd.gxcj.subjectmanager.handler;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
@@ -26,6 +27,8 @@ public class GlobalExceptionHandler {
         } else if (e instanceof AppException){
             AppException ae = (AppException) e;
             return R.newInstance(ae.getStatus());
+        } else if (e instanceof NotPermissionException) {
+            return R.newInstance(RStatus.NOT_PERMISSION);
         }
         e.printStackTrace();
         return R.fail();

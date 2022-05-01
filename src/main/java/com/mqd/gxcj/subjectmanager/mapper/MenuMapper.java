@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.mapper;
 
+import com.mqd.gxcj.subjectmanager.pojo.Menu;
 import com.mqd.gxcj.subjectmanager.pojo.Permission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -9,8 +10,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author 莫桥德
- * @since 2022-05-01
+ * @since 2022-03-18
  */
-public interface PermissionMapper extends BaseMapper<Permission> {
+public interface MenuMapper extends BaseMapper<Menu> {
 
 }

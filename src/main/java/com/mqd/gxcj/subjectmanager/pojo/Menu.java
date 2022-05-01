@@ -10,9 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
-
 /**
  * <p>
  * 
@@ -24,24 +21,39 @@ import javax.validation.constraints.Null;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("p_permission")
-@ApiModel(value = "Permission对象", description = "")
-public class Permission implements Serializable {
+@TableName("p_menu")
+@ApiModel(value = "Menu对象", description = "")
+public class Menu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
-    @Null
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty("权限名称")
-    @NotBlank
+    @ApiModelProperty("菜单英文名")
+    private String name;
+
+    @ApiModelProperty("菜单路径")
+    private String path;
+
+    @ApiModelProperty("父级菜单id")
+    private Integer parent;
+
+    @ApiModelProperty("菜单功能，只有最低级的菜单才有")
     private String permission;
 
-    @NotBlank
-    @ApiModelProperty("权限描述")
-    private String description;
+    @ApiModelProperty("组件")
+    private String component;
+
+    @ApiModelProperty("是否隐藏")
+    private Boolean hidden;
+
+    @ApiModelProperty("菜单名字")
+    private String title;
+
+    @ApiModelProperty("菜单icon")
+    private String icon;
 
 
 }

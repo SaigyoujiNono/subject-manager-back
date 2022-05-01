@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author 莫桥德
- * @since 2022-03-18
+ * @since 2022-05-01
  */
 public interface RolePermissionService extends IService<RolePermission> {
 

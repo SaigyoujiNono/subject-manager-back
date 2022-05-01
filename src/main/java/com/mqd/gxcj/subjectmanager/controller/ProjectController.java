@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import cn.dev33.satoken.stp.StpUtil;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Project;
 import com.mqd.gxcj.subjectmanager.pojo.vo.*;
+import com.mqd.gxcj.subjectmanager.service.ProjectExpertizeService;
 import com.mqd.gxcj.subjectmanager.service.ProjectService;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
@@ -33,10 +35,14 @@ import java.util.List;
 @Api(tags = "项目管理")
 @RestController
 @RequestMapping("/project")
+@SaCheckLogin
 public class ProjectController {
 
     @Resource
     private ProjectService projectService;
+
+    @Resource
+    private ProjectExpertizeService projectExpertizeService;
 
     @ApiOperation(value = "项目申报")
     @PostMapping("/project")
@@ -105,5 +111,14 @@ public class ProjectController {
             return R.ok();
         }
         throw new AppException(RStatus.ERROR);
+    }
+
+    @ApiOperation(value= "根据用户id获取正在等待专家评审的项目")
+    @GetMapping("/checkingByExpert")
+    public R checkingByExpert(AppPage appPage) {
+        String userId = (String) StpUtil.getLoginId();
+        IPage<Project> page = projectExpertizeService.getCheckingProjectByUserId(userId, appPage);
+        BeanUtils.copyProperties(page, appPage);
+        return R.ok().put("projects", page.getRecords()).put("pageInfo", appPage);
     }
 }

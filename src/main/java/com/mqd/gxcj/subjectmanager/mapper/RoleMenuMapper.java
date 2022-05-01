@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.mapper;
 
+import com.mqd.gxcj.subjectmanager.pojo.RoleMenu;
 import com.mqd.gxcj.subjectmanager.pojo.RolePermission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -9,8 +10,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author 莫桥德
- * @since 2022-05-01
+ * @since 2022-03-18
  */
-public interface RolePermissionMapper extends BaseMapper<RolePermission> {
+public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
 
 }

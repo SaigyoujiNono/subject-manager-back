@@ -3,13 +3,12 @@ package com.mqd.gxcj.subjectmanager.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.mapper.*;
 import com.mqd.gxcj.subjectmanager.pojo.*;
 import com.mqd.gxcj.subjectmanager.pojo.dto.RelevanceInfo;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserForm;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserModifyForm;
-import com.mqd.gxcj.subjectmanager.pojo.vo.UserVo;
+import com.mqd.gxcj.subjectmanager.pojo.vo.*;
 import com.mqd.gxcj.subjectmanager.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mqd.gxcj.subjectmanager.utils.MD5Utils;
@@ -20,6 +19,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
@@ -122,6 +123,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public IPage<User> listOnProjectExpert(IPage<User> page, QueryWrapper<User> queryWrapper) {
         return baseMapper.listOnProjectMember(page, queryWrapper);
+    }
+
+    @Override
+    public IPage<User> getUserListByQuery(UserQuery userQuery, AppPage appPage) {
+        String name = userQuery.getName();
+        Boolean sex = userQuery.getSex();
+        Integer education = userQuery.getEducation();
+        Integer duty = userQuery.getDuty();
+        Integer subjectId = userQuery.getSubjectId();
+        Integer rank = userQuery.getRank();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.hasText(name)) {
+            queryWrapper.like("name", name);
+        }
+
+        if (sex != null) {
+            queryWrapper.eq("sex", sex);
+        }
+
+        if (education != null) {
+            queryWrapper.eq("education", education);
+        }
+
+        if (duty != null) {
+            queryWrapper.eq("duty", duty);
+        }
+
+        if (subjectId != null) {
+            queryWrapper.eq("subjectId", subjectId);
+        }
+
+        if (rank != null) {
+            queryWrapper.eq("rank", rank);
+        }
+
+        IPage<User> page = new Page<>(appPage.getCurrent(), appPage.getSize());
+        return baseMapper.selectPage(page, queryWrapper);
     }
 
     @Cacheable(key = "#id")
