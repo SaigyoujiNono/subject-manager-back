@@ -54,7 +54,7 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
         return generateRoutes(list, 0);
     }
 
-//    @Cacheable(keyGenerator = "userIdKeyGenerator")
+    @Cacheable(keyGenerator = "userIdKeyGenerator")
     @Override
     public List<Route> getRoutesByIds(List<Integer> ids) throws AppException {
 
@@ -78,8 +78,8 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
         return generateRoutes(getMenuListByRoleId(id), 0);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    @CacheEvict(key = "'role_'+#id")
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    @CacheEvict(key = "'role_'+#id", allEntries=true)
     @Override
     public boolean addRoutesByRoleId(Integer id, List<Integer> menuIds) throws AppException {
         // 检查角色是否一致

@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Permission;
+import com.mqd.gxcj.subjectmanager.pojo.vo.RolePermForm;
 import com.mqd.gxcj.subjectmanager.service.PermissionService;
 import com.mqd.gxcj.subjectmanager.utils.R;
 import com.mqd.gxcj.subjectmanager.utils.RStatus;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -50,6 +52,17 @@ public class PermissionController {
     @ApiOperation(value = "根据角色id返回权限")
     @GetMapping("/getByRole")
     public R getPermissionByRole(Integer roleId) {
+        List<Permission> perms = permissionService.getPermissionByRoleId(roleId);
+        return R.ok().put("perms", perms);
+    }
+
+    @ApiOperation(value = "根据角色id保存权限配置")
+    @PostMapping("/savePerms")
+    public R savePermsByRole(@RequestBody @Validated RolePermForm rolePermForm) throws AppException {
+        boolean save = permissionService.saveRolePerms(rolePermForm);
+        if (!save) {
+            throw new AppException(RStatus.ERROR);
+        }
         return R.ok();
     }
 }

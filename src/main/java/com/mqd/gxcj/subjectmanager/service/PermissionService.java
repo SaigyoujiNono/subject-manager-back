@@ -1,7 +1,11 @@
 package com.mqd.gxcj.subjectmanager.service;
 
+import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Permission;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mqd.gxcj.subjectmanager.pojo.vo.RolePermForm;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PermissionService extends IService<Permission> {
 
+    List<Permission> getPermissionByRoleId(Integer roleId);
+
+    boolean saveRolePerms(RolePermForm rolePermForm) throws AppException;
 }

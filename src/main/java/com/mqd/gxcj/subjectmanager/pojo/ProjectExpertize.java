@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * 专家意见，因为一个项目存在多个专家评审，所以专家意见单独一张表
@@ -35,12 +38,14 @@ public class ProjectExpertize implements Serializable {
     private String userId;
 
     @ApiModelProperty("项目id")
+    @NotBlank
     private String projectId;
 
     @ApiModelProperty("项目阶段，commited为初审阶段，finish为项目验收阶段")
     private String stage;
 
     @ApiModelProperty("专家意见")
+    @NotBlank
     private String expertOpinion;
 
     @ApiModelProperty("创建时间")

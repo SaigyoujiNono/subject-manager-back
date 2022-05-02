@@ -3,6 +3,7 @@ package com.mqd.gxcj.subjectmanager.service;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Project;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mqd.gxcj.subjectmanager.pojo.ProjectExpertize;
 import com.mqd.gxcj.subjectmanager.pojo.vo.AppProjectForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.CheckProjectForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.ProjectDetail;
@@ -32,4 +33,6 @@ public interface ProjectService extends IService<Project> {
      * 材料审核方法
      */
     boolean checkProjectByMaterial(CheckProjectForm form) throws AppException;
+
+    boolean expertCheckProject(ProjectExpertize projectExpertize);
 }

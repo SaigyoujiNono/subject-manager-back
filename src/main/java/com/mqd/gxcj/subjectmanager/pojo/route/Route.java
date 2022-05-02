@@ -1,5 +1,6 @@
 package com.mqd.gxcj.subjectmanager.pojo.route;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,4 +18,6 @@ public class Route {
     private Integer parent;
     private Boolean hidden;
     private String title;
+    @ApiModelProperty("组件路径")
+    private String componentUrl;
 }

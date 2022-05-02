@@ -1,6 +1,7 @@
 package com.mqd.gxcj.subjectmanager.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import cn.dev33.satoken.stp.StpUtil;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Project;
+import com.mqd.gxcj.subjectmanager.pojo.ProjectExpertize;
 import com.mqd.gxcj.subjectmanager.pojo.vo.*;
 import com.mqd.gxcj.subjectmanager.service.ProjectExpertizeService;
 import com.mqd.gxcj.subjectmanager.service.ProjectService;
@@ -46,7 +48,7 @@ public class ProjectController {
 
     @ApiOperation(value = "项目申报")
     @PostMapping("/project")
-    @SaCheckRole(value = {"principal"}, mode = SaMode.OR)
+    @SaCheckPermission(value = {"project:applicate"}, mode = SaMode.OR)
     public R applicationProject(@RequestBody @Validated AppProjectForm appProjectForm) throws AppException {
         System.out.println(appProjectForm);
         boolean b = projectService.applicationProject(appProjectForm);
@@ -105,6 +107,7 @@ public class ProjectController {
 
     @ApiOperation(value = "材料审核的接口")
     @PostMapping("/checkProject")
+    @SaCheckPermission(value = {"project:materialCheck"}, mode = SaMode.OR)
     public R checkProject(@RequestBody CheckProjectForm form) throws AppException {
         boolean b = projectService.checkProjectByMaterial(form);
         if (b) {
@@ -120,5 +123,17 @@ public class ProjectController {
         IPage<Project> page = projectExpertizeService.getCheckingProjectByUserId(userId, appPage);
         BeanUtils.copyProperties(page, appPage);
         return R.ok().put("projects", page.getRecords()).put("pageInfo", appPage);
+    }
+
+    @ApiOperation(value = "专家提交评审意见")
+    @PostMapping("/expertOpinion")
+    public R subExpertOpinion(@RequestBody @Validated ProjectExpertize projectExpertize) throws AppException {
+        String loginId = (String)StpUtil.getLoginId();
+        projectExpertize.setUserId(loginId);
+        boolean flag = projectService.expertCheckProject(projectExpertize);
+        if (!flag){
+            throw new AppException(RStatus.ERROR);
+        }
+        return R.ok();
     }
 }

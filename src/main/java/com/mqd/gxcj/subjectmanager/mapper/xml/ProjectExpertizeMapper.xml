@@ -6,6 +6,7 @@
     <result column="project_id" property="projectId" />
     <result column="user_id" property="userId" />
     <result column="stage" property="stage" />
+    <result column="expert_opinion" property="expertOpinion" />
     <result column="create_time" property="createTime" />
     <result column="update_time" property="updateTime" />
     <association property="detail" javaType="com.mqd.gxcj.subjectmanager.pojo.User">

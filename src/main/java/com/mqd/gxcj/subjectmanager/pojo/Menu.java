@@ -46,6 +46,9 @@ public class Menu implements Serializable {
     @ApiModelProperty("组件")
     private String component;
 
+    @ApiModelProperty("组件路径")
+    private String componentUrl;
+
     @ApiModelProperty("是否隐藏")
     private Boolean hidden;
 

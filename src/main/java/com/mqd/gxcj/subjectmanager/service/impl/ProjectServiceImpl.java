@@ -192,6 +192,18 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 .setNoPassOpinion(opinion)
                 .setReviewTime(LocalDateTime.now())
                 .setReviewUId((String) StpUtil.getLoginId());
+        baseMapper.updateById(project);
         return true;
+    }
+
+    @CacheEvict(key = "#projectExpertize.projectId")
+    @Override
+    public boolean expertCheckProject(ProjectExpertize projectExpertize) {
+        projectExpertize.setId(null);
+        return projectExpertizeService.update(projectExpertize,
+                new QueryWrapper<ProjectExpertize>()
+                .eq("user_id", projectExpertize.getUserId())
+                .eq("project_id", projectExpertize.getProjectId())
+        );
     }
 }

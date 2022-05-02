@@ -49,6 +49,9 @@ public class ProjectExpertizeServiceImpl extends ServiceImpl<ProjectExpertizeMap
         // 根据id查询项目
         IPage<Project> page = new Page<>();
         BeanUtils.copyProperties(pePage, page);
+        if (collect.size() == 0) {
+            return page;
+        }
         page.setRecords(projectService.listByIds(collect));
         return page;
     }
