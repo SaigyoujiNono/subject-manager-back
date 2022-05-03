@@ -2,12 +2,14 @@ package com.mqd.gxcj.subjectmanager.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.*;
 import com.mqd.gxcj.subjectmanager.mapper.ProjectMapper;
 import com.mqd.gxcj.subjectmanager.pojo.dto.ExpertOpinion;
 import com.mqd.gxcj.subjectmanager.pojo.dto.RelevanceInfo;
 import com.mqd.gxcj.subjectmanager.pojo.vo.AppProjectForm;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ApprovalProjectForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.CheckProjectForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.ProjectDetail;
 import com.mqd.gxcj.subjectmanager.service.*;
@@ -205,5 +207,51 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 .eq("user_id", projectExpertize.getUserId())
                 .eq("project_id", projectExpertize.getProjectId())
         );
+    }
+
+    @CacheEvict(key = "#approvalProject.id")
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    @Override
+    public boolean approvalProject(ApprovalProjectForm approvalProject) throws AppException {
+        // 判断项目id是否存在
+        String id = approvalProject.getId();
+        Project project = baseMapper.selectById(id);
+        if (project == null) {
+            throw new AppException(RStatus.PROJECT_NOT_EXIST);
+        }
+        // 判断项目状态是否在专家评审状态 只有在专家评审状态才可以继续
+        if (!project.getStatus().equals(Project.EXPERT)) {
+            throw new AppException(RStatus.PROJECT_STATUS_ERROR);
+        }
+        // 获取当前用户
+        String loginId = (String)StpUtil.getLoginId();
+        User user = userService.getById(loginId);
+        if (user == null) {
+            throw new AppException(RStatus.ACCOUNT_NOT_EXIST);
+        }
+        // 获取项目意见
+        String opinion = approvalProject.getOpinion();
+        // 拒绝立项
+        if (StringUtils.hasText(opinion)) {
+            // 将项目重新设置为不通过审核状态
+            project.setStatus(Project.NO_CHECKED)
+                    .setReviewUId(user.getId())
+                    .setNoPassOpinion(opinion)
+                    .setReviewTime(LocalDateTime.now());
+            baseMapper.updateById(project);
+            return true;
+        }
+        // 同意立项
+        project.setStatus(Project.COMMITTED)
+                .setReviewUId(user.getId())
+                .setNoPassOpinion("")
+                .setReviewTime(LocalDateTime.now());
+        baseMapper.updateById(project);
+        return true;
+    }
+
+    @Override
+    public IPage<Project> pageMyProjectList(IPage<Project> page, QueryWrapper<Project> projectQuery) {
+        return baseMapper.pageMyProjectList(page, projectQuery);
     }
 }
