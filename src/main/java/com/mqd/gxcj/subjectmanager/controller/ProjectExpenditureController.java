@@ -62,6 +62,7 @@ public class ProjectExpenditureController {
 
     @ApiOperation(value = "经费审核")
     @PostMapping("checkExpenditure")
+    @SaCheckPermission(value = "expenditure:check")
     public R checkExpenditure(@RequestBody @Validated CheckExpenditureForm checkExpenditureForm) throws AppException {
         if (projectExpenditureService.checkExpenditure(checkExpenditureForm)){
             return R.ok();
@@ -71,6 +72,7 @@ public class ProjectExpenditureController {
 
     @ApiOperation(value = "修改经费单信息")
     @PutMapping("/update")
+    @SaCheckPermission(value = "expenditure:application")
     public R updateExpenditure(@RequestBody @Validated UpdateProjectExpenditureForm projectExpenditureForm) throws AppException {
         if(projectExpenditureService.updateProjectExpenditure(projectExpenditureForm)) {
             return R.ok();
@@ -90,6 +92,7 @@ public class ProjectExpenditureController {
         LocalDateTime maxCommittedTime = expenditureQuery.getMaxCommittedTime();
         BigDecimal minExpenditure = expenditureQuery.getMinExpenditure();
         BigDecimal maxExpenditure = expenditureQuery.getMaxExpenditure();
+        String userId = expenditureQuery.getUserId();
         if (StringUtils.hasText(name)) {
             query.like("name", name);
         }
@@ -107,6 +110,9 @@ public class ProjectExpenditureController {
         }
         if (maxExpenditure != null) {
             query.ge("expenditure", maxExpenditure);
+        }
+        if (StringUtils.hasText(userId)) {
+            query.eq("application_user_id", userId);
         }
         return query;
     }

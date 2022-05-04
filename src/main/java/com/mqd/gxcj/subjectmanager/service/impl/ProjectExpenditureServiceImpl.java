@@ -1,6 +1,9 @@
 package com.mqd.gxcj.subjectmanager.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.Project;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpenditure;
@@ -48,6 +51,16 @@ public class ProjectExpenditureServiceImpl extends ServiceImpl<ProjectExpenditur
         String status = project.getStatus();
         if(!status.equals(Project.COMMITTED)) {
             throw new AppException(RStatus.PROJECT_STATUS_ERROR);
+        }
+        // 判断当前用户是否是项目的参与成员
+        IPage<Project> page = new Page<>(1,1);
+        String userId = StpUtil.getLoginIdAsString();
+        page = projectService.pageMyProjectList(page, new QueryWrapper<Project>()
+                .eq("principal",userId)
+                .or()
+                .in("pu.user_id", userId));
+        if (page.getTotal() == 0) {
+            throw new AppException(RStatus.VERIFY_ERROR);
         }
         ProjectExpenditure projectExpenditure = new ProjectExpenditure();
         // 将表单数据复制到数据对象

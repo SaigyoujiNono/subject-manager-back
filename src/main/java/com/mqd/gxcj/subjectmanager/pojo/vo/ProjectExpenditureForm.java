@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Data
@@ -21,6 +22,7 @@ public class ProjectExpenditureForm {
 
     @ApiModelProperty("名称")
     @NotBlank
+    @Size(max = 255)
     private String name;
 
     @ApiModelProperty("用途")

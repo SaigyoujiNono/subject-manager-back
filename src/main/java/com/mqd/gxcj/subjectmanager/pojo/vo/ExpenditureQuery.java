@@ -14,6 +14,9 @@ public class ExpenditureQuery {
     @ApiModelProperty("名称")
     private String name;
 
+    @ApiModelProperty("用户id")
+    private String userId;
+
     @ApiModelProperty("最小申请经费")
     private BigDecimal minExpenditure;
 
