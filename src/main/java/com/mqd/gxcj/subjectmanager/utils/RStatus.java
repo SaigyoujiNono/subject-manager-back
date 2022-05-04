@@ -15,6 +15,8 @@ public enum RStatus {
     FILE_NOT_EXIST(40014,"文件不存在"),
     NOT_LOGIN(40002,"未登录"),
     NOT_PERMISSION(40003,"权限不足"),
+    EXPENDITURE_NOT_EXIST(40200,"经费单不存在"),
+    EXPENDITURE_STATUS_ERROR(40201,"经费单状态错误"),
     ERROR(40001,"error");
 
     public final int code;

@@ -50,9 +50,7 @@ public class ProjectController {
     @PostMapping("/project")
     @SaCheckPermission(value = {"project:applicate"}, mode = SaMode.OR)
     public R applicationProject(@RequestBody @Validated AppProjectForm appProjectForm) throws AppException {
-        System.out.println(appProjectForm);
-        boolean b = projectService.applicationProject(appProjectForm);
-        if (b){
+        if (projectService.applicationProject(appProjectForm)){
             return R.ok();
         }
         throw new AppException(RStatus.ERROR);
@@ -123,16 +121,14 @@ public class ProjectController {
     @ApiOperation(value = "根据id获取项目的详细信息")
     @GetMapping("/project/{id}")
     public R getProjectDetail(@PathVariable String id) throws AppException {
-        ProjectDetail projectDetailById = projectService.getProjectDetailById(id);
-        return R.ok().put("projectDetail", projectDetailById);
+        return R.ok().put("projectDetail", projectService.getProjectDetailById(id));
     }
 
     @ApiOperation(value = "材料审核的接口")
     @PostMapping("/checkProject")
     @SaCheckPermission(value = {"project:materialCheck"}, mode = SaMode.OR)
     public R checkProject(@RequestBody CheckProjectForm form) throws AppException {
-        boolean b = projectService.checkProjectByMaterial(form);
-        if (b) {
+        if (projectService.checkProjectByMaterial(form)) {
             return R.ok();
         }
         throw new AppException(RStatus.ERROR);
@@ -150,22 +146,20 @@ public class ProjectController {
     @ApiOperation(value = "专家提交评审意见")
     @PostMapping("/expertOpinion")
     public R subExpertOpinion(@RequestBody @Validated ProjectExpertize projectExpertize) throws AppException {
-        String loginId = (String)StpUtil.getLoginId();
+        String loginId = StpUtil.getLoginIdAsString();
         projectExpertize.setUserId(loginId);
-        boolean flag = projectService.expertCheckProject(projectExpertize);
-        if (!flag){
-            throw new AppException(RStatus.ERROR);
+        if (projectService.expertCheckProject(projectExpertize)){
+            return R.ok();
         }
-        return R.ok();
+        throw new AppException(RStatus.ERROR);
     }
 
     @ApiOperation(value= "项目立项管理操作，可以选择立项或者拒绝立项并填写理由")
     @PostMapping("/approvalProject")
     public R approvalProject(@RequestBody @Validated ApprovalProjectForm approvalProject) throws AppException {
-        boolean approval = projectService.approvalProject(approvalProject);
-        if (!approval) {
-            throw new AppException(RStatus.ERROR);
+        if (projectService.approvalProject(approvalProject)) {
+            return R.ok();
         }
-        return R.ok();
+        throw new AppException(RStatus.ERROR);
     }
 }

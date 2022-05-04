@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,9 +56,8 @@ public class RoleMenuController {
         QueryWrapper<UserRole> userRoleQuery = new QueryWrapper<>();
         userRoleQuery.eq("user_id", StpUtil.getLoginId());
         List<String> roleList = StpUtil.getRoleList();
-        List<Route> routesByIds = null;
-        boolean b = roleList.stream().anyMatch(el -> el.equals("admin"));
-        if (b) {
+        List<Route> routesByIds;
+        if (roleList.stream().anyMatch(el -> el.equals("admin"))) {
             routesByIds = roleMenuService.getRoutes();
         }else {
             List<UserRole> list = userRoleService.list(userRoleQuery);
@@ -69,20 +69,14 @@ public class RoleMenuController {
 
     @ApiOperation(value = "根据角色id获取角色所拥有的路由表")
     @GetMapping("/routes")
-    public R getRoutesByRoleId(Integer id) throws AppException {
-        if (id == null) {
-            throw new AppException(RStatus.VERIFY_ERROR);
-        }
+    public R getRoutesByRoleId(@NotNull Integer id) throws AppException {
         List<Route> routes = roleMenuService.getRoutesById(id);
         return R.ok().put("routes", routes);
     }
 
     @ApiOperation(value = "根据角色id获取角色所拥有的路由列表")
     @GetMapping("/routeList")
-    public R getRouteListByRoleId(Integer id) throws AppException {
-        if (id == null) {
-            throw new AppException(RStatus.VERIFY_ERROR);
-        }
+    public R getRouteListByRoleId(@NotNull Integer id) {
         List<Menu> routes = roleMenuService.getMenuListByRoleId(id);
         return R.ok().put("routes", routes);
     }
@@ -90,7 +84,9 @@ public class RoleMenuController {
     @ApiOperation(value = "根据角色id设置角色所拥有的路由表")
     @PostMapping("/routes")
     public R addRoutesById(@RequestBody @Validated RoleMenuForm roleMenuForm) throws AppException {
-        boolean is = roleMenuService.addRoutesByRoleId(roleMenuForm.getId(), roleMenuForm.getMenuIds());
-        return R.ok();
+        if (roleMenuService.addRoutesByRoleId(roleMenuForm.getId(), roleMenuForm.getMenuIds())){
+            return R.ok();
+        }
+        throw new AppException(RStatus.ERROR);
     }
 }

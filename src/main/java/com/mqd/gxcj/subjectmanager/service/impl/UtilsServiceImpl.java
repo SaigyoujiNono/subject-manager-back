@@ -8,7 +8,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @CacheConfig(cacheNames = "relevance")
@@ -43,5 +45,13 @@ public class UtilsServiceImpl implements UtilsService {
                 .setRanks(ranks)
                 .setEducations(educations);
         return relevanceInfo;
+    }
+
+    @Cacheable(key = "'homeStatistic'")
+    @Override
+    public Map<String, Object> homeStatistic() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("", "");
+        return map;
     }
 }

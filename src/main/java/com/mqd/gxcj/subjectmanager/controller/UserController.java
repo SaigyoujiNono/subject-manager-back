@@ -40,8 +40,7 @@ public class UserController {
     @ApiOperation(value = "添加一个新用户")
     @PostMapping("/user")
     public R addUser(@RequestBody @Validated UserForm userForm) throws AppException {
-        boolean save = userService.saveUser(userForm);
-        if (save){
+        if (userService.saveUser(userForm)){
             return R.ok();
         }
         throw new AppException(RStatus.ERROR);
