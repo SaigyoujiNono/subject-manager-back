@@ -1,9 +1,12 @@
 package com.mqd.gxcj.subjectmanager.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.exception.AppException;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpenditure;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mqd.gxcj.subjectmanager.pojo.vo.CheckExpenditureForm;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ExpenditureAndProjectVo;
 import com.mqd.gxcj.subjectmanager.pojo.vo.ProjectExpenditureForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.UpdateProjectExpenditureForm;
 
@@ -33,4 +36,9 @@ public interface ProjectExpenditureService extends IService<ProjectExpenditure> 
      * 修改经费审核，只有审核未通过的经费单才可以修改
      */
     boolean updateProjectExpenditure(UpdateProjectExpenditureForm projectExpenditureForm) throws AppException;
+
+    /**
+     * 获取项目列表
+     */
+    IPage<ExpenditureAndProjectVo> getProjectList(IPage<ExpenditureAndProjectVo> page, QueryWrapper<ProjectExpenditure> query);
 }

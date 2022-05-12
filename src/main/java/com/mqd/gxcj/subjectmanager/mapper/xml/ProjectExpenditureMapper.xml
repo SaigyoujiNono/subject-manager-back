@@ -1,5 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mqd.gxcj.subjectmanager.mapper.ProjectExpenditureMapper">
+    <resultMap id="ExpAndProj" type="com.mqd.gxcj.subjectmanager.pojo.vo.ExpenditureAndProjectVo">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="application_user_id" property="applicationUserId" />
+        <result column="purpose" property="purpose" />
+        <result column="name" property="name" />
+        <result column="expenditure" property="expenditure" />
+        <result column="check_status" property="checkStatus" />
+        <result column="checker" property="checker" />
+        <result column="check_time" property="checkTime" />
+        <result column="committed_time" property="committedTime" />
+        <result column="no_checked_opinion" property="noCheckedOpinion" />
+        <association property="project">
+            <id column="p_id" property="id" />
+            <result column="p_principal" property="principal" />
+            <result column="p_name" property="name" />
+            <result column="p_subject_id" property="subjectId" />
+            <result column="p_direction" property="direction" />
+            <result column="p_expenditure" property="expenditure" />
+            <result column="p_explanation" property="explanation" />
+            <result column="p_material" property="material" />
+            <result column="p_create_time" property="createTime" />
+            <result column="p_checked" property="checked" />
+            <result column="p_no_pass_opinion" property="noPassOpinion" />
+            <result column="p_review_time" property="reviewTime" />
+            <result column="p_review_u_id" property="reviewUId" />
+            <result column="p_final_review_time" property="finalReviewTime" />
+            <result column="p_final_expenditure" property="finalExpenditure" />
+            <result column="p_status" property="status" />
+        </association>
+        <association property="user">
+            <id column="u_id" property="id" />
+            <result column="u_name" property="name" />
+        </association>
+    </resultMap>
 
+
+    <select id="getProjectList" resultMap="ExpAndProj">
+        SELECT
+            e.id,
+            e.project_id,
+            e.application_user_id,
+            e.purpose,
+            e.`name`,
+            e.expenditure,
+            e.check_status,
+            e.checker,
+            e.check_time,
+            e.committed_time,
+            e.no_checked_opinion,
+            p.id AS p_id,
+            p.principal AS p_principal,
+            p.`name` AS p_name,
+            p.subject_id AS p_subject_id,
+            p.direction AS p_direction,
+            p.expenditure AS p_expenditure,
+            p.explanation AS p_explanation,
+            p.material AS p_material,
+            p.create_time AS p_create_time,
+            p.checked AS p_checked,
+            p.no_pass_opinion AS p_no_pass_opinion,
+            p.review_time AS p_review_time,
+            p.review_u_id AS p_review_u_id,
+            p.final_review_time AS p_final_review_time,
+            p.final_expenditure AS p_final_expenditure,
+            p.`status` AS p_status,
+            u.id AS u_id,
+            u.name AS u_name
+        FROM    s_project_expenditure AS e
+        LEFT JOIN   s_project AS p  ON  e.project_id = p.id
+        LEFT JOIN   s_user AS u ON e.application_user_id = u.id
+        ${ew.customSqlSegment}
+    </select>
 </mapper>

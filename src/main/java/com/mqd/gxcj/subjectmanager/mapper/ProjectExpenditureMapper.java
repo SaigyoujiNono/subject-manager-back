@@ -1,7 +1,11 @@
 package com.mqd.gxcj.subjectmanager.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpenditure;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ExpenditureAndProjectVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProjectExpenditureMapper extends BaseMapper<ProjectExpenditure> {
 
+    IPage<ExpenditureAndProjectVo> getProjectList(IPage<ExpenditureAndProjectVo> page, @Param("ew") QueryWrapper<ProjectExpenditure> query);
 }

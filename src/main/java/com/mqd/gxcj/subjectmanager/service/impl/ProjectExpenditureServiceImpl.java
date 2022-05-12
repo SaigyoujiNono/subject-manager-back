@@ -9,6 +9,7 @@ import com.mqd.gxcj.subjectmanager.pojo.Project;
 import com.mqd.gxcj.subjectmanager.pojo.ProjectExpenditure;
 import com.mqd.gxcj.subjectmanager.mapper.ProjectExpenditureMapper;
 import com.mqd.gxcj.subjectmanager.pojo.vo.CheckExpenditureForm;
+import com.mqd.gxcj.subjectmanager.pojo.vo.ExpenditureAndProjectVo;
 import com.mqd.gxcj.subjectmanager.pojo.vo.ProjectExpenditureForm;
 import com.mqd.gxcj.subjectmanager.pojo.vo.UpdateProjectExpenditureForm;
 import com.mqd.gxcj.subjectmanager.service.ProjectExpenditureService;
@@ -127,5 +128,10 @@ public class ProjectExpenditureServiceImpl extends ServiceImpl<ProjectExpenditur
                 .setCheckStatus(ProjectExpenditure.COMMITTED);
         baseMapper.updateById(pe);
         return true;
+    }
+
+    @Override
+    public IPage<ExpenditureAndProjectVo> getProjectList(IPage<ExpenditureAndProjectVo> page, QueryWrapper<ProjectExpenditure> query) {
+        return baseMapper.getProjectList(page, query);
     }
 }

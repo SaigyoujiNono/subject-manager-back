@@ -54,8 +54,8 @@ public class ProjectExpenditureController {
     public R getExpenditureList(ExpenditureQuery expenditureQuery, AppPage appPage){
         QueryWrapper<ProjectExpenditure> query = getProjectExpenditureQueryWrapper(expenditureQuery);
 
-        IPage<ProjectExpenditure> page = new Page<>(appPage.getCurrent(), appPage.getSize());
-        page = projectExpenditureService.page(page, query);
+        IPage<ExpenditureAndProjectVo> page = new Page<>(appPage.getCurrent(), appPage.getSize());
+        page = projectExpenditureService.getProjectList(page, query);
         BeanUtils.copyProperties(page, appPage);
         return R.ok().put("pageInfo", appPage).put("expenditureList", page.getRecords());
     }
@@ -109,7 +109,7 @@ public class ProjectExpenditureController {
             query.ge("expenditure", minExpenditure);
         }
         if (maxExpenditure != null) {
-            query.ge("expenditure", maxExpenditure);
+            query.le("expenditure", maxExpenditure);
         }
         if (StringUtils.hasText(userId)) {
             query.eq("application_user_id", userId);
